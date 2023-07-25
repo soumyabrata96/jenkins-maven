@@ -1,15 +1,11 @@
 package com.multithreading.demo.controller;
 
 import com.multithreading.demo.entity.Car;
-import com.multithreading.demo.entity.User;
 import com.multithreading.demo.service.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Flux;
-
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -27,7 +23,7 @@ public class CarController {
         return carService.getAllCarsAsync().get();
     }
     @GetMapping("/async2/cars")
-    public ResponseEntity getCarsAsync2() throws ExecutionException, InterruptedException {
+    public ResponseEntity getCarsAsync2(){
         CompletableFuture<List<Car>> cars1 = carService.getAllCarsAsync();
         CompletableFuture<List<Car>> cars2 = carService.getAllCarsAsync();
         CompletableFuture<List<Car>> cars3 = carService.getAllCarsAsync();
