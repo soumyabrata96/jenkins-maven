@@ -13,6 +13,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,6 +38,7 @@ public class UserController {
         }
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+    @Async
     @GetMapping(value = "/v1/users/list",produces = {MediaType.APPLICATION_JSON_VALUE})
     public CompletableFuture<ResponseEntity<Page<User>>> getUsers1(
             @RequestParam(value = "pageNo", defaultValue = AppConstants.DEFAULT_PAGE_NUMBER, required = false) int pageNo,
@@ -44,7 +46,8 @@ public class UserController {
             @RequestParam(value = "sortBy", defaultValue = AppConstants.DEFAULT_SORT_BY, required = false) String sortBy,
             @RequestParam(value = "sortDir", defaultValue = AppConstants.DEFAULT_SORT_DIRECTION, required = false) String sortDir
     ) {
-        return userService.getAllUsers(pageNo,pageSize,sortBy,sortDir).thenApply(ResponseEntity::ok);
+        CompletableFuture<Page<User>> userPage=userService.getAllUsers(pageNo,pageSize,sortBy,sortDir);
+        return userPage.thenApply(ResponseEntity::ok);
     }
    /* @GetMapping(value = "/v2/users/list",produces = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity getUsers2(
@@ -65,6 +68,7 @@ public class UserController {
     }*/
 
     @TimeLimiter(name = "test-timeout",fallbackMethod = "fallbackMethod")
+    @Async
     @GetMapping("/users/{id}")
     public CompletableFuture<ResponseEntity<User>> getUserById(@PathVariable long id) throws ExecutionException, InterruptedException {
         return userService.getUserById(id).thenApply(ResponseEntity::ok);
